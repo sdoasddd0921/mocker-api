@@ -169,7 +169,12 @@ export interface MockerOption {
    * }
    * ```
    */
-  header?: Record<string,string | number | string[]>
+  header?: Record<string,string | number | string[]>;
+  /**
+   * mock 地址前缀
+   * @default ``
+   */
+  forward?: string
 }
 
 const pathToRegexp = toRegexp.pathToRegexp;
@@ -228,7 +233,8 @@ export default function (app: Application, watchFile: string | string[] | Mocker
     bodyParserRaw: {},
     bodyParserUrlencoded: {},
     watchOptions: {},
-    header: {}
+    header: {},
+    forward: ''
   }
 
   options = { ...defaultOptions, ...options };
@@ -282,7 +288,7 @@ export default function (app: Application, watchFile: string | string[] | Mocker
      * => `GET /api/:owner/:repo/raw/:ref/(.*)`
      */
     const mockerKey: string = Object.keys(mocker).find((kname) => {
-      return !!pathToRegexp(kname.replace((new RegExp('^' + req.method + ' ')), '')).exec(req.path);
+      return !!pathToRegexp(options.forward + kname.replace((new RegExp('^' + req.method + ' ')), '')).exec(req.path);
     });
     /**
      * Access Control Allow options.
